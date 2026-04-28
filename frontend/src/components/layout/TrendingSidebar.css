@@ -1,0 +1,37 @@
+.trending-sidebar {
+  padding: var(--spacing-md);
+}
+
+.trending-sidebar h3 {
+  margin-bottom: var(--spacing-md);
+  font-size: 1.1rem;
+  font-weight: 700;
+}
+
+.hashtag-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-md);
+}
+
+.hashtag-item {
+  display: flex;
+  flex-direction: column;
+  cursor: pointer;
+  transition: opacity 0.2s;
+}
+
+.hashtag-item:hover {
+  opacity: 0.8;
+}
+
+.tag-name {
+  color: var(--accent-primary);
+  font-weight: 600;
+  font-size: 1rem;
+}
+
+.tag-count {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+}

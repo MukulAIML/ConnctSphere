@@ -1,0 +1,36 @@
+server:
+  port: 8086
+
+spring:
+  application:
+    name: media-service
+  datasource:
+    url: ${DB_URL:jdbc:mysql://connectsphere-db:3306/media_db?createDatabaseIfNotExist=true&useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC}
+    username: ${DB_USERNAME:mukul}
+    password: ${DB_PASSWORD:password}
+    driver-class-name: com.mysql.cj.jdbc.Driver
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.MySQLDialect
+        format_sql: true
+
+app:
+  jwt:
+    secret: ${JWT_SECRET:ConnectSphereSecretKey2026ConnectSphereSecretKey2026ConnectSphereSecretKey}
+
+post-service:
+  url: ${POST_SERVICE_URL:http://post-service:8081}
+
+media:
+  upload:
+    max-image-kb: ${MEDIA_MAX_IMAGE_KB:10240}
+    max-video-kb: ${MEDIA_MAX_VIDEO_KB:51200}
+
+eureka:
+  client:
+    service-url:
+      defaultZone: ${EUREKA_SERVER:http://service-registry:8761/eureka/}

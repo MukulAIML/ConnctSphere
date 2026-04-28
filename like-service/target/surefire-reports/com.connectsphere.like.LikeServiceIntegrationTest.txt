@@ -1,0 +1,4 @@
+-------------------------------------------------------------------------------
+Test set: com.connectsphere.like.LikeServiceIntegrationTest
+-------------------------------------------------------------------------------
+Tests run: 6, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 9.652 s -- in com.connectsphere.like.LikeServiceIntegrationTest

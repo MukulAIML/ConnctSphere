@@ -1,0 +1,84 @@
+import React, { useState } from 'react';
+import { useNavigate, Link } from 'react-router-dom';
+import api from '../../services/api';
+import { useAuth } from '../../context/AuthContext';
+import './Auth.css';
+
+const Login = () => {
+  // 🔥 changed username → email
+  const [credentials, setCredentials] = useState({ email: '', password: '' });
+
+  const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
+  const { login } = useAuth();
+  const navigate = useNavigate();
+
+  const handleChange = (e) => {
+    setCredentials({ ...credentials, [e.target.name]: e.target.value });
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setLoading(true);
+    setError('');
+
+    try {
+      const res = await api.post('/auth/login', credentials);
+
+      const { token, user } = res.data.data;
+      login(token, user);
+      navigate('/feed');
+
+    } catch (err) {
+      setError(err.response?.data?.message || 'Login failed. Please check your credentials.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return (
+    <div className="auth-page">
+      <div className="auth-card glass">
+        <h1 className="gradient-text">Welcome Back</h1>
+        <p>Login to ConnectSphere</p>
+        
+        <form onSubmit={handleSubmit}>
+          <div className="form-group">
+            {/* 🔥 label fixed */}
+            <label>Email</label>
+            <input 
+              type="email" 
+              name="email" 
+              required 
+              value={credentials.email}
+              onChange={handleChange}
+            />
+          </div>
+
+          <div className="form-group">
+            <label>Password</label>
+            <input 
+              type="password" 
+              name="password" 
+              required 
+              value={credentials.password}
+              onChange={handleChange}
+            />
+          </div>
+          
+          {error && <div className="error-msg">{error}</div>}
+          
+          <button type="submit" className="btn-primary auth-btn" disabled={loading}>
+            {loading ? 'Logging in...' : 'Login'}
+          </button>
+        </form>
+        
+        <div className="auth-footer">
+          Don't have an account? <Link to="/register">Sign Up</Link>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export default Login;

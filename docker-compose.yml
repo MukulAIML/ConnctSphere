@@ -1,0 +1,260 @@
+services:
+  connectsphere-db:
+    image: mysql:8.0
+    container_name: connectsphere-db
+    ports:
+      - "3307:3306"
+    # 🛡️ THE ARCHITECTURAL GUARANTEE: Force MySQL to use native password plugin and optimize buffer pool.
+    command: --default-authentication-plugin=mysql_native_password --innodb-buffer-pool-size=128M
+    environment:
+      - MYSQL_ROOT_PASSWORD=root
+    volumes:
+      - ./docker-config/init-db.sql:/docker-entrypoint-initdb.d/init-db.sql
+      - mysql_data:/var/lib/mysql
+    networks:
+      - connectsphere-network
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-proot"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  service-registry:
+    build: ./service-registry
+    mem_limit: 512m
+    container_name: service-registry
+    ports:
+      - "8761:8761"
+    environment:
+      - JAVA_TOOL_OPTIONS=-Xms128m -Xmx384m
+    networks:
+      - connectsphere-network
+
+  api-gateway:
+    build: ./api-gateway
+    mem_limit: 512m
+    container_name: api-gateway
+    ports:
+      - "9000:9000"
+    environment:
+      - JAVA_TOOL_OPTIONS=-Xms128m -Xmx384m
+      - SPRING_JPA_OPEN_IN_VIEW=false
+      - EUREKA_SERVER=http://service-registry:8761/eureka/
+    depends_on:
+      - service-registry
+      - auth-service
+      - post-service
+      - comment-service
+      - like-service
+      - follow-service
+      - notification-service
+      - media-service
+      - search-service
+    networks:
+      - connectsphere-network
+
+  auth-service:
+    build: ./auth-service
+    mem_limit: 512m
+    container_name: auth-service
+    environment:
+      - JAVA_TOOL_OPTIONS=-Xms128m -Xmx384m
+      - SPRING_JPA_OPEN_IN_VIEW=false
+      - SPRING_APPLICATION_NAME=auth-service
+      - SPRING_DATASOURCE_URL=jdbc:mysql://connectsphere-db:3306/connectsphere_auth?createDatabaseIfNotExist=true&useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC
+      - SPRING_DATASOURCE_USERNAME=mukul
+      - SPRING_DATASOURCE_PASSWORD=password
+      - LOGGING_LEVEL_ORG_SPRINGFRAMEWORK_JDBC=DEBUG
+      - JWT_SECRET=ConnectSphereSecretKey2026ConnectSphereSecretKey2026ConnectSphereSecretKey
+      - EUREKA_SERVER=http://service-registry:8761/eureka/
+    depends_on:
+      connectsphere-db:
+        condition: service_healthy
+      service-registry:
+        condition: service_started
+    networks:
+      - connectsphere-network
+
+  post-service:
+    build: ./post-service
+    mem_limit: 512m
+    container_name: post-service
+    environment:
+      - JAVA_TOOL_OPTIONS=-Xms128m -Xmx384m
+      - SPRING_JPA_OPEN_IN_VIEW=false
+      - SPRING_APPLICATION_NAME=post-service
+      - SPRING_DATASOURCE_URL=jdbc:mysql://connectsphere-db:3306/post_db?createDatabaseIfNotExist=true&useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC
+      - SPRING_DATASOURCE_USERNAME=mukul
+      - SPRING_DATASOURCE_PASSWORD=password
+      - LOGGING_LEVEL_ORG_SPRINGFRAMEWORK_JDBC=DEBUG
+      - JWT_SECRET=ConnectSphereSecretKey2026ConnectSphereSecretKey2026ConnectSphereSecretKey
+      - SEARCH_SERVICE_URL=http://search-service:8087
+      - FOLLOW_SERVICE_URL=http://follow-service:8084
+      - MEDIA_SERVICE_URL=http://media-service:8086
+      - EUREKA_SERVER=http://service-registry:8761/eureka/
+    depends_on:
+      connectsphere-db:
+        condition: service_healthy
+      service-registry:
+        condition: service_started
+    networks:
+      - connectsphere-network
+
+  comment-service:
+    build: ./comment-service
+    mem_limit: 512m
+    container_name: comment-service
+    environment:
+      - JAVA_TOOL_OPTIONS=-Xms128m -Xmx384m
+      - SPRING_JPA_OPEN_IN_VIEW=false
+      - SPRING_APPLICATION_NAME=comment-service
+      - SPRING_DATASOURCE_URL=jdbc:mysql://connectsphere-db:3306/comment_db?createDatabaseIfNotExist=true&useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC
+      - SPRING_DATASOURCE_USERNAME=mukul
+      - SPRING_DATASOURCE_PASSWORD=password
+      - LOGGING_LEVEL_ORG_SPRINGFRAMEWORK_JDBC=DEBUG
+      - JWT_SECRET=ConnectSphereSecretKey2026ConnectSphereSecretKey2026ConnectSphereSecretKey
+      - POST_SERVICE_URL=http://post-service:8081
+      - NOTIFICATION_SERVICE_URL=http://notification-service:8085
+      - COMMENT_SERVICE_URL=http://comment-service:8082
+      - EUREKA_SERVER=http://service-registry:8761/eureka/
+    depends_on:
+      connectsphere-db:
+        condition: service_healthy
+      service-registry:
+        condition: service_started
+    networks:
+      - connectsphere-network
+
+  like-service:
+    build: ./like-service
+    mem_limit: 512m
+    container_name: like-service
+    environment:
+      - JAVA_TOOL_OPTIONS=-Xms128m -Xmx384m
+      - SPRING_JPA_OPEN_IN_VIEW=false
+      - SPRING_APPLICATION_NAME=like-service
+      - SPRING_DATASOURCE_URL=jdbc:mysql://connectsphere-db:3306/like_db?createDatabaseIfNotExist=true&useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC
+      - SPRING_DATASOURCE_USERNAME=mukul
+      - SPRING_DATASOURCE_PASSWORD=password
+      - LOGGING_LEVEL_ORG_SPRINGFRAMEWORK_JDBC=DEBUG
+      - JWT_SECRET=ConnectSphereSecretKey2026ConnectSphereSecretKey2026ConnectSphereSecretKey
+      - POST_SERVICE_URL=http://post-service:8081
+      - NOTIFICATION_SERVICE_URL=http://notification-service:8085
+      - COMMENT_SERVICE_URL=http://comment-service:8082
+      - EUREKA_SERVER=http://service-registry:8761/eureka/
+    depends_on:
+      connectsphere-db:
+        condition: service_healthy
+      service-registry:
+        condition: service_started
+    networks:
+      - connectsphere-network
+
+  follow-service:
+    build: ./follow-service
+    mem_limit: 512m
+    container_name: follow-service
+    environment:
+      - JAVA_TOOL_OPTIONS=-Xms128m -Xmx384m
+      - SPRING_JPA_OPEN_IN_VIEW=false
+      - SPRING_APPLICATION_NAME=follow-service
+      - SPRING_DATASOURCE_URL=jdbc:mysql://connectsphere-db:3306/follow_db?createDatabaseIfNotExist=true&useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC
+      - SPRING_DATASOURCE_USERNAME=mukul
+      - SPRING_DATASOURCE_PASSWORD=password
+      - LOGGING_LEVEL_ORG_SPRINGFRAMEWORK_JDBC=DEBUG
+      - JWT_SECRET=ConnectSphereSecretKey2026ConnectSphereSecretKey2026ConnectSphereSecretKey
+      - NOTIFICATION_SERVICE_URL=http://notification-service:8085
+      - EUREKA_SERVER=http://service-registry:8761/eureka/
+    depends_on:
+      connectsphere-db:
+        condition: service_healthy
+      service-registry:
+        condition: service_started
+    networks:
+      - connectsphere-network
+
+  notification-service:
+    build: ./notification-service
+    mem_limit: 512m
+    container_name: notification-service
+    environment:
+      - JAVA_TOOL_OPTIONS=-Xms128m -Xmx384m
+      - SPRING_JPA_OPEN_IN_VIEW=false
+      - SPRING_APPLICATION_NAME=notification-service
+      - SPRING_DATASOURCE_URL=jdbc:mysql://connectsphere-db:3306/notification_db?createDatabaseIfNotExist=true&useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC
+      - SPRING_DATASOURCE_USERNAME=mukul
+      - SPRING_DATASOURCE_PASSWORD=password
+      - LOGGING_LEVEL_ORG_SPRINGFRAMEWORK_JDBC=DEBUG
+      - JWT_SECRET=ConnectSphereSecretKey2026ConnectSphereSecretKey2026ConnectSphereSecretKey
+      - AUTH_SERVICE_URL=http://auth-service:8080
+      - POST_SERVICE_URL=http://post-service:8081
+      - EUREKA_SERVER=http://service-registry:8761/eureka/
+    depends_on:
+      connectsphere-db:
+        condition: service_healthy
+      service-registry:
+        condition: service_started
+    networks:
+      - connectsphere-network
+
+  media-service:
+    build: ./media-service
+    mem_limit: 512m
+    container_name: media-service
+    environment:
+      - JAVA_TOOL_OPTIONS=-Xms128m -Xmx384m
+      - SPRING_JPA_OPEN_IN_VIEW=false
+      - SPRING_APPLICATION_NAME=media-service
+      - SPRING_DATASOURCE_URL=jdbc:mysql://connectsphere-db:3306/media_db?createDatabaseIfNotExist=true&useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC
+      - SPRING_DATASOURCE_USERNAME=mukul
+      - SPRING_DATASOURCE_PASSWORD=password
+      - LOGGING_LEVEL_ORG_SPRINGFRAMEWORK_JDBC=DEBUG
+      - JWT_SECRET=ConnectSphereSecretKey2026ConnectSphereSecretKey2026ConnectSphereSecretKey
+      - POST_SERVICE_URL=http://post-service:8081
+      - EUREKA_SERVER=http://service-registry:8761/eureka/
+    depends_on:
+      connectsphere-db:
+        condition: service_healthy
+      service-registry:
+        condition: service_started
+    networks:
+      - connectsphere-network
+
+  search-service:
+    build: ./search-service
+    mem_limit: 512m
+    container_name: search-service
+    environment:
+      - JAVA_TOOL_OPTIONS=-Xms128m -Xmx384m
+      - SPRING_JPA_OPEN_IN_VIEW=false
+      - SPRING_APPLICATION_NAME=search-service
+      - SPRING_DATASOURCE_URL=jdbc:mysql://connectsphere-db:3306/search_db?createDatabaseIfNotExist=true&useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC
+      - SPRING_DATASOURCE_USERNAME=mukul
+      - SPRING_DATASOURCE_PASSWORD=password
+      - LOGGING_LEVEL_ORG_SPRINGFRAMEWORK_JDBC=DEBUG
+      - JWT_SECRET=ConnectSphereSecretKey2026ConnectSphereSecretKey2026ConnectSphereSecretKey
+      - EUREKA_SERVER=http://service-registry:8761/eureka/
+    depends_on:
+      connectsphere-db:
+        condition: service_healthy
+      service-registry:
+        condition: service_started
+    networks:
+      - connectsphere-network
+
+  frontend:
+    build: ./frontend
+    container_name: connectsphere-ui
+    ports:
+      - "80:80"
+    depends_on:
+      - api-gateway
+    networks:
+      - connectsphere-network
+
+networks:
+  connectsphere-network:
+    driver: bridge
+
+volumes:
+  mysql_data:

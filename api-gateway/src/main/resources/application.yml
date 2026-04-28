@@ -1,0 +1,108 @@
+server:
+  port: 9000
+
+spring:
+  application:
+    name: api-gateway
+
+  cloud:
+    gateway:
+      # ── Global CORS ──────────────────────────────────────────────────────────
+      globalcors:
+        cors-configurations:
+          '[/**]':
+            allowedOrigins: "*"
+            allowedMethods:
+              - GET
+              - POST
+              - PUT
+              - DELETE
+              - OPTIONS
+            allowedHeaders: "*"
+            # Expose Authorization so clients can read it back (e.g. refresh flows)
+            exposedHeaders:
+              - Authorization
+
+      # ── Default filters applied to EVERY route ───────────────────────────────
+      # PreserveHostHeader: keeps the original Host header.
+      # There is NO RemoveRequestHeader for Authorization here — the token must
+      # be forwarded as-is to every downstream service so they can validate JWT.
+      default-filters:
+        - PreserveHostHeader
+
+      # ── Routes ───────────────────────────────────────────────────────────────
+      routes:
+        - id: auth-service
+          uri: lb://AUTH-SERVICE
+          predicates:
+            - Path=/api/v1/auth/**, /auth/**
+          filters:
+            - RewritePath=/api/v1/auth(?<segment>/?.*), /auth${segment}
+
+        - id: post-service
+          uri: lb://POST-SERVICE
+          predicates:
+            - Path=/api/v1/posts/**, /posts/**
+          filters:
+            - RewritePath=/api/v1/posts(?<segment>/?.*), /posts${segment}
+
+        - id: comment-service
+          uri: lb://COMMENT-SERVICE
+          predicates:
+            - Path=/api/v1/comments/**, /comments/**
+          filters:
+            - RewritePath=/api/v1/comments(?<segment>/?.*), /comments${segment}
+
+        - id: like-service
+          uri: lb://LIKE-SERVICE
+          predicates:
+            - Path=/api/v1/likes/**, /likes/**
+          filters:
+            - RewritePath=/api/v1/likes(?<segment>/?.*), /likes${segment}
+
+        - id: follow-service
+          uri: lb://FOLLOW-SERVICE
+          predicates:
+            - Path=/api/v1/follows/**, /follows/**
+          filters:
+            - RewritePath=/api/v1/follows(?<segment>/?.*), /follows${segment}
+
+        - id: notification-service
+          uri: lb://NOTIFICATION-SERVICE
+          predicates:
+            - Path=/api/v1/notifications/**, /notifications/**
+          filters:
+            - RewritePath=/api/v1/notifications(?<segment>/?.*), /notifications${segment}
+
+        - id: media-service-media
+          uri: lb://MEDIA-SERVICE
+          predicates:
+            - Path=/api/v1/media/**, /media/**
+          filters:
+            - RewritePath=/api/v1/media(?<segment>/?.*), /media${segment}
+
+        - id: media-service-stories
+          uri: lb://MEDIA-SERVICE
+          predicates:
+            - Path=/api/v1/stories/**, /stories/**
+          filters:
+            - RewritePath=/api/v1/stories(?<segment>/?.*), /stories${segment}
+
+        - id: search-service
+          uri: lb://SEARCH-SERVICE
+          predicates:
+            - Path=/api/v1/search/**, /search/**
+          filters:
+            - RewritePath=/api/v1/search(?<segment>/?.*), /search${segment}
+
+        - id: hashtag-service
+          uri: lb://SEARCH-SERVICE
+          predicates:
+            - Path=/api/v1/hashtags/**, /hashtags/**
+          filters:
+            - RewritePath=/api/v1/hashtags(?<segment>/?.*), /hashtags${segment}
+
+eureka:
+  client:
+    service-url:
+      defaultZone: ${EUREKA_SERVER:http://service-registry:8761/eureka/}

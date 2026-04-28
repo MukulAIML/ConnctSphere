@@ -1,0 +1,394 @@
+{
+  "info": {
+    "name": "ConnectSphere Microservices",
+    "description": "Complete test suite for the ConnectSphere social media platform covering all 8 microservices.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    { "key": "auth_url", "value": "http://localhost:8080" },
+    { "key": "post_url", "value": "http://localhost:8081" },
+    { "key": "comment_url", "value": "http://localhost:8082" },
+    { "key": "like_url", "value": "http://localhost:8083" },
+    { "key": "follow_url", "value": "http://localhost:8084" },
+    { "key": "notification_url", "value": "http://localhost:8085" },
+    { "key": "media_url", "value": "http://localhost:8086" },
+    { "key": "search_url", "value": "http://localhost:8087" },
+    { "key": "token", "value": "" },
+    { "key": "userId", "value": "1" },
+    { "key": "postId", "value": "1" },
+    { "key": "commentId", "value": "1" }
+  ],
+  "item": [
+    {
+      "name": "1. Auth Flow",
+      "item": [
+        {
+          "name": "Register User",
+          "request": {
+            "method": "POST",
+            "header": [ { "key": "Content-Type", "value": "application/json" } ],
+            "url": { "raw": "{{auth_url}}/auth/register", "host": ["{{auth_url}}"], "path": ["auth", "register"] },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"username\": \"testuser\",\n    \"email\": \"test@example.com\",\n    \"password\": \"password123\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Login User",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "var jsonData = pm.response.json();",
+                  "if(jsonData.token) {",
+                  "    pm.collectionVariables.set(\"token\", jsonData.token);",
+                  "}",
+                  "if(jsonData.user && jsonData.user.userId) {",
+                  "    pm.collectionVariables.set(\"userId\", jsonData.user.userId);",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [ { "key": "Content-Type", "value": "application/json" } ],
+            "url": { "raw": "{{auth_url}}/auth/login", "host": ["{{auth_url}}"], "path": ["auth", "login"] },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"username\": \"testuser\",\n    \"password\": \"password123\"\n}"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "2. Post Flow",
+      "item": [
+        {
+          "name": "Create Post",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "var jsonData = pm.response.json();",
+                  "if(jsonData.data && jsonData.data.postId) {",
+                  "    pm.collectionVariables.set(\"postId\", jsonData.data.postId);",
+                  "} else if (jsonData.postId) {",
+                  "    pm.collectionVariables.set(\"postId\", jsonData.postId);",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "auth": { "type": "bearer", "bearer": [ { "key": "token", "value": "{{token}}", "type": "string" } ] },
+            "method": "POST",
+            "header": [ { "key": "Content-Type", "value": "application/json" } ],
+            "url": { "raw": "{{post_url}}/posts", "host": ["{{post_url}}"], "path": ["posts"] },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"content\": \"Hello world! Check out this #hashtag\",\n    \"mediaUrls\": [],\n    \"postType\": \"TEXT\",\n    \"visibility\": \"PUBLIC\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Get Post by ID",
+          "request": {
+            "auth": { "type": "bearer", "bearer": [ { "key": "token", "value": "{{token}}", "type": "string" } ] },
+            "method": "GET",
+            "url": { "raw": "{{post_url}}/posts/{{postId}}", "host": ["{{post_url}}"], "path": ["posts", "{{postId}}"] }
+          }
+        },
+        {
+          "name": "Get Posts by User",
+          "request": {
+            "auth": { "type": "bearer", "bearer": [ { "key": "token", "value": "{{token}}", "type": "string" } ] },
+            "method": "GET",
+            "url": { "raw": "{{post_url}}/posts/user/{{userId}}", "host": ["{{post_url}}"], "path": ["posts", "user", "{{userId}}"] }
+          }
+        },
+        {
+          "name": "Generate Feed",
+          "request": {
+            "auth": { "type": "bearer", "bearer": [ { "key": "token", "value": "{{token}}", "type": "string" } ] },
+            "method": "POST",
+            "header": [ { "key": "Content-Type", "value": "application/json" } ],
+            "url": { "raw": "{{post_url}}/posts/feed", "host": ["{{post_url}}"], "path": ["posts", "feed"] },
+            "body": {
+              "mode": "raw",
+              "raw": "[\n    1, 2, 3\n]"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "3. Comment Flow",
+      "item": [
+        {
+          "name": "Add Comment to Post",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "var jsonData = pm.response.json();",
+                  "if(jsonData.commentId) {",
+                  "    pm.collectionVariables.set(\"commentId\", jsonData.commentId);",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "auth": { "type": "bearer", "bearer": [ { "key": "token", "value": "{{token}}", "type": "string" } ] },
+            "method": "POST",
+            "header": [ { "key": "Content-Type", "value": "application/json" } ],
+            "url": { "raw": "{{comment_url}}/comments", "host": ["{{comment_url}}"], "path": ["comments"] },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"postId\": {{postId}},\n    \"content\": \"Great post!\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Reply to Comment",
+          "request": {
+            "auth": { "type": "bearer", "bearer": [ { "key": "token", "value": "{{token}}", "type": "string" } ] },
+            "method": "POST",
+            "header": [ { "key": "Content-Type", "value": "application/json" } ],
+            "url": { "raw": "{{comment_url}}/comments", "host": ["{{comment_url}}"], "path": ["comments"] },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"postId\": {{postId}},\n    \"parentCommentId\": {{commentId}},\n    \"content\": \"I totally agree with this!\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Get Comments By Post",
+          "request": {
+            "auth": { "type": "bearer", "bearer": [ { "key": "token", "value": "{{token}}", "type": "string" } ] },
+            "method": "GET",
+            "url": { "raw": "{{comment_url}}/comments/post/{{postId}}", "host": ["{{comment_url}}"], "path": ["comments", "post", "{{postId}}"] }
+          }
+        }
+      ]
+    },
+    {
+      "name": "4. Like Flow",
+      "item": [
+        {
+          "name": "Like Post",
+          "request": {
+            "auth": { "type": "bearer", "bearer": [ { "key": "token", "value": "{{token}}", "type": "string" } ] },
+            "method": "POST",
+            "header": [ { "key": "Content-Type", "value": "application/json" } ],
+            "url": { "raw": "{{like_url}}/likes", "host": ["{{like_url}}"], "path": ["likes"] },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"targetId\": {{postId}},\n    \"targetType\": \"POST\",\n    \"reactionType\": \"LIKE\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Unlike Post",
+          "request": {
+            "auth": { "type": "bearer", "bearer": [ { "key": "token", "value": "{{token}}", "type": "string" } ] },
+            "method": "DELETE",
+            "url": {
+              "raw": "{{like_url}}/likes?targetId={{postId}}&targetType=POST",
+              "host": ["{{like_url}}"],
+              "path": ["likes"],
+              "query": [
+                { "key": "targetId", "value": "{{postId}}" },
+                { "key": "targetType", "value": "POST" }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Like Comment",
+          "request": {
+            "auth": { "type": "bearer", "bearer": [ { "key": "token", "value": "{{token}}", "type": "string" } ] },
+            "method": "POST",
+            "header": [ { "key": "Content-Type", "value": "application/json" } ],
+            "url": { "raw": "{{like_url}}/likes", "host": ["{{like_url}}"], "path": ["likes"] },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"targetId\": {{commentId}},\n    \"targetType\": \"COMMENT\",\n    \"reactionType\": \"LOVE\"\n}"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "5. Follow Flow",
+      "item": [
+        {
+          "name": "Follow User",
+          "request": {
+            "auth": { "type": "bearer", "bearer": [ { "key": "token", "value": "{{token}}", "type": "string" } ] },
+            "method": "POST",
+            "header": [ { "key": "Content-Type", "value": "application/json" } ],
+            "url": { "raw": "{{follow_url}}/follows", "host": ["{{follow_url}}"], "path": ["follows"] },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"followeeId\": 2\n}"
+            }
+          }
+        },
+        {
+          "name": "Unfollow User",
+          "request": {
+            "auth": { "type": "bearer", "bearer": [ { "key": "token", "value": "{{token}}", "type": "string" } ] },
+            "method": "DELETE",
+            "url": { "raw": "{{follow_url}}/follows?followeeId=2", "host": ["{{follow_url}}"], "path": ["follows"], "query": [ { "key": "followeeId", "value": "2" } ] }
+          }
+        },
+        {
+          "name": "Get Followers",
+          "request": {
+            "auth": { "type": "bearer", "bearer": [ { "key": "token", "value": "{{token}}", "type": "string" } ] },
+            "method": "GET",
+            "url": { "raw": "{{follow_url}}/follows/followers/{{userId}}", "host": ["{{follow_url}}"], "path": ["follows", "followers", "{{userId}}"] }
+          }
+        }
+      ]
+    },
+    {
+      "name": "6. Notification Flow",
+      "item": [
+        {
+          "name": "Get My Notifications",
+          "request": {
+            "auth": { "type": "bearer", "bearer": [ { "key": "token", "value": "{{token}}", "type": "string" } ] },
+            "method": "GET",
+            "url": { "raw": "{{notification_url}}/notifications", "host": ["{{notification_url}}"], "path": ["notifications"] }
+          }
+        },
+        {
+          "name": "Get Unread Notifications",
+          "request": {
+            "auth": { "type": "bearer", "bearer": [ { "key": "token", "value": "{{token}}", "type": "string" } ] },
+            "method": "GET",
+            "url": { "raw": "{{notification_url}}/notifications/unread", "host": ["{{notification_url}}"], "path": ["notifications", "unread"] }
+          }
+        },
+        {
+          "name": "Mark All as Read",
+          "request": {
+            "auth": { "type": "bearer", "bearer": [ { "key": "token", "value": "{{token}}", "type": "string" } ] },
+            "method": "PUT",
+            "url": { "raw": "{{notification_url}}/notifications/read-all", "host": ["{{notification_url}}"], "path": ["notifications", "read-all"] }
+          }
+        }
+      ]
+    },
+    {
+      "name": "7. Media Flow",
+      "item": [
+        {
+          "name": "Upload Media",
+          "request": {
+            "auth": { "type": "bearer", "bearer": [ { "key": "token", "value": "{{token}}", "type": "string" } ] },
+            "method": "POST",
+            "header": [ { "key": "Content-Type", "value": "application/json" } ],
+            "url": { "raw": "{{media_url}}/media", "host": ["{{media_url}}"], "path": ["media"] },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"url\": \"https://example.com/image.png\",\n    \"mediaType\": \"IMAGE\",\n    \"sizeKb\": 1024,\n    \"mimeType\": \"image/png\",\n    \"linkedPostId\": {{postId}}\n}"
+            }
+          }
+        },
+        {
+          "name": "Get Media by Post",
+          "request": {
+            "auth": { "type": "bearer", "bearer": [ { "key": "token", "value": "{{token}}", "type": "string" } ] },
+            "method": "GET",
+            "url": { "raw": "{{media_url}}/media/post/{{postId}}", "host": ["{{media_url}}"], "path": ["media", "post", "{{postId}}"] }
+          }
+        },
+        {
+          "name": "Create Story",
+          "request": {
+            "auth": { "type": "bearer", "bearer": [ { "key": "token", "value": "{{token}}", "type": "string" } ] },
+            "method": "POST",
+            "header": [ { "key": "Content-Type", "value": "application/json" } ],
+            "url": { "raw": "{{media_url}}/stories", "host": ["{{media_url}}"], "path": ["stories"] },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"mediaUrl\": \"https://example.com/story.jpg\",\n    \"caption\": \"My day!\",\n    \"mediaType\": \"IMAGE\"\n}"
+            }
+          }
+        },
+        {
+          "name": "View Story",
+          "request": {
+            "auth": { "type": "bearer", "bearer": [ { "key": "token", "value": "{{token}}", "type": "string" } ] },
+            "method": "PUT",
+            "url": { "raw": "{{media_url}}/stories/1/view", "host": ["{{media_url}}"], "path": ["stories", "1", "view"] }
+          }
+        }
+      ]
+    },
+    {
+      "name": "8. Search Flow",
+      "item": [
+        {
+          "name": "Index Post (Internal)",
+          "request": {
+            "auth": { "type": "bearer", "bearer": [ { "key": "token", "value": "{{token}}", "type": "string" } ] },
+            "method": "POST",
+            "header": [ { "key": "Content-Type", "value": "application/json" } ],
+            "url": { "raw": "{{search_url}}/search/index", "host": ["{{search_url}}"], "path": ["search", "index"] },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"postId\": {{postId}},\n    \"content\": \"Check out this #trending hashtag\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Search Posts",
+          "request": {
+            "auth": { "type": "bearer", "bearer": [ { "key": "token", "value": "{{token}}", "type": "string" } ] },
+            "method": "GET",
+            "url": {
+              "raw": "{{search_url}}/search/posts?keyword=trending",
+              "host": ["{{search_url}}"],
+              "path": ["search", "posts"],
+              "query": [ { "key": "keyword", "value": "trending" } ]
+            }
+          }
+        },
+        {
+          "name": "Search Hashtags",
+          "request": {
+            "auth": { "type": "bearer", "bearer": [ { "key": "token", "value": "{{token}}", "type": "string" } ] },
+            "method": "GET",
+            "url": {
+              "raw": "{{search_url}}/search/hashtags?keyword=tre",
+              "host": ["{{search_url}}"],
+              "path": ["search", "hashtags"],
+              "query": [ { "key": "keyword", "value": "tre" } ]
+            }
+          }
+        },
+        {
+          "name": "Get Trending Hashtags",
+          "request": {
+            "auth": { "type": "bearer", "bearer": [ { "key": "token", "value": "{{token}}", "type": "string" } ] },
+            "method": "GET",
+            "url": { "raw": "{{search_url}}/search/hashtags/trending", "host": ["{{search_url}}"], "path": ["search", "hashtags", "trending"] }
+          }
+        }
+      ]
+    }
+  ]
+}

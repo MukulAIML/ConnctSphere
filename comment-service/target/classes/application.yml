@@ -1,0 +1,35 @@
+server:
+  port: 8082
+
+spring:
+  application:
+    name: comment-service
+  datasource:
+    url: ${DB_URL:jdbc:mysql://connectsphere-db:3306/comment_db?createDatabaseIfNotExist=true&useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC}
+    username: ${DB_USERNAME:mukul}
+    password: ${DB_PASSWORD:password}
+    driver-class-name: com.mysql.cj.jdbc.Driver
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.MySQLDialect
+        format_sql: true
+
+app:
+  jwt:
+    secret: ${JWT_SECRET:ConnectSphereSecretKey2026ConnectSphereSecretKey2026ConnectSphereSecretKey}
+    expiration-ms: 86400000
+
+post-service:
+  url: ${POST_SERVICE_URL:http://post-service:8081}
+
+notification-service:
+  url: ${NOTIFICATION_SERVICE_URL:http://notification-service:8085}
+
+eureka:
+  client:
+    service-url:
+      defaultZone: ${EUREKA_SERVER:http://service-registry:8761/eureka/}

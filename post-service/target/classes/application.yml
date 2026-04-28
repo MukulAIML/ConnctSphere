@@ -1,0 +1,37 @@
+server:
+  port: 8081
+
+spring:
+  application:
+    name: post-service
+  datasource:
+    url: ${DB_URL:jdbc:mysql://connectsphere-db:3306/post_db?createDatabaseIfNotExist=true&useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC}
+    username: ${DB_USERNAME:mukul}
+    password: ${DB_PASSWORD:password}
+    driver-class-name: com.mysql.cj.jdbc.Driver
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.MySQLDialect
+        format_sql: true
+
+app:
+  jwt:
+    secret: ${JWT_SECRET:ConnectSphereSecretKey2026ConnectSphereSecretKey2026ConnectSphereSecretKey}
+
+search-service:
+  url: ${SEARCH_SERVICE_URL:http://search-service:8087}
+
+follow-service:
+  url: ${FOLLOW_SERVICE_URL:http://follow-service:8084}
+
+media-service:
+  url: ${MEDIA_SERVICE_URL:http://media-service:8086}
+
+eureka:
+  client:
+    service-url:
+      defaultZone: ${EUREKA_SERVER:http://service-registry:8761/eureka/}
