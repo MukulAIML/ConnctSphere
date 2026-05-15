@@ -1,0 +1,3 @@
+com/connectsphere/gateway/ApiGatewayApplication.class
+com/connectsphere/gateway/config/OpenApiConfig.class
+com/connectsphere/gateway/exception/GlobalExceptionHandler.class
