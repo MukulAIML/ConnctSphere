@@ -2,3 +2,8 @@ target/
 **/target/
 .idea/
 .vscode/
+target/
+**/target/
+.idea/
+.vscode/
+.github/
