@@ -1,0 +1,320 @@
+services:
+  - type: pserv
+    name: service-registry
+    runtime: docker
+    plan: starter
+    repo: https://github.com/MukulAIML/ConnctSphere.git
+    branch: service-registry
+    dockerfilePath: service-registry/Dockerfile
+    dockerContext: service-registry
+    envVars:
+      - key: PORT
+        value: "8761"
+      - key: JAVA_TOOL_OPTIONS
+        value: -Xms128m -Xmx384m
+
+  - type: web
+    name: api-gateway
+    runtime: docker
+    plan: starter
+    repo: https://github.com/MukulAIML/ConnctSphere.git
+    branch: api-gateway
+    dockerfilePath: api-gateway/Dockerfile
+    dockerContext: api-gateway
+    envVars:
+      - key: PORT
+        value: "9000"
+      - key: EUREKA_SERVER
+        value: http://service-registry:8761/eureka/
+      - key: JAVA_TOOL_OPTIONS
+        value: -Xms128m -Xmx384m
+
+  - type: pserv
+    name: auth-service
+    runtime: docker
+    plan: starter
+    repo: https://github.com/MukulAIML/ConnctSphere.git
+    branch: auth-service
+    dockerfilePath: auth-service/Dockerfile
+    dockerContext: auth-service
+    envVars:
+      - key: PORT
+        value: "8080"
+      - key: SPRING_DATASOURCE_URL
+        sync: false
+      - key: SPRING_DATASOURCE_USERNAME
+        sync: false
+      - key: SPRING_DATASOURCE_PASSWORD
+        sync: false
+      - key: SPRING_DATA_REDIS_HOST
+        value: redis
+      - key: SPRING_DATA_REDIS_PORT
+        value: "6379"
+      - key: APP_JWT_SECRET
+        sync: false
+      - key: APP_JWT_EXPIRATION_MS
+        value: "86400000"
+      - key: APP_JWT_REFRESH_EXPIRATION_MS
+        value: "604800000"
+      - key: EUREKA_SERVER
+        value: http://service-registry:8761/eureka/
+      - key: JAVA_TOOL_OPTIONS
+        value: -Xms128m -Xmx384m
+
+  - type: pserv
+    name: post-service
+    runtime: docker
+    plan: starter
+    repo: https://github.com/MukulAIML/ConnctSphere.git
+    branch: post-service
+    dockerfilePath: post-service/Dockerfile
+    dockerContext: post-service
+    envVars:
+      - key: PORT
+        value: "8081"
+      - key: DB_URL
+        sync: false
+      - key: DB_USERNAME
+        sync: false
+      - key: DB_PASSWORD
+        sync: false
+      - key: REDIS_HOST
+        value: redis
+      - key: REDIS_PORT
+        value: "6379"
+      - key: RABBITMQ_HOST
+        value: rabbitmq
+      - key: RABBITMQ_PORT
+        value: "5672"
+      - key: RABBITMQ_USERNAME
+        sync: false
+      - key: RABBITMQ_PASSWORD
+        sync: false
+      - key: JWT_SECRET
+        sync: false
+      - key: SEARCH_SERVICE_URL
+        value: http://search-service:8087
+      - key: FOLLOW_SERVICE_URL
+        value: http://follow-service:8084
+      - key: MEDIA_SERVICE_URL
+        value: http://media-service:8086
+      - key: AUTH_SERVICE_URL
+        value: http://auth-service:8080
+      - key: COMMENT_SERVICE_URL
+        value: http://comment-service:8082
+      - key: NOTIFICATION_SERVICE_URL
+        value: http://notification-service:8085
+      - key: EUREKA_SERVER
+        value: http://service-registry:8761/eureka/
+      - key: JAVA_TOOL_OPTIONS
+        value: -Xms128m -Xmx384m
+
+  - type: pserv
+    name: comment-service
+    runtime: docker
+    plan: starter
+    repo: https://github.com/MukulAIML/ConnctSphere.git
+    branch: comment-service
+    dockerfilePath: comment-service/Dockerfile
+    dockerContext: comment-service
+    envVars:
+      - key: PORT
+        value: "8082"
+      - key: DB_URL
+        sync: false
+      - key: DB_USERNAME
+        sync: false
+      - key: DB_PASSWORD
+        sync: false
+      - key: JWT_SECRET
+        sync: false
+      - key: RABBITMQ_HOST
+        value: rabbitmq
+      - key: RABBITMQ_PORT
+        value: "5672"
+      - key: RABBITMQ_USERNAME
+        sync: false
+      - key: RABBITMQ_PASSWORD
+        sync: false
+      - key: EUREKA_SERVER
+        value: http://service-registry:8761/eureka/
+      - key: JAVA_TOOL_OPTIONS
+        value: -Xms128m -Xmx384m
+
+  - type: pserv
+    name: like-service
+    runtime: docker
+    plan: starter
+    repo: https://github.com/MukulAIML/ConnctSphere.git
+    branch: like-service
+    dockerfilePath: LikeService/Dockerfile
+    dockerContext: LikeService
+    envVars:
+      - key: PORT
+        value: "8083"
+      - key: SERVER_PORT
+        value: "8083"
+      - key: DB_URL
+        sync: false
+      - key: DB_USERNAME
+        sync: false
+      - key: DB_PASSWORD
+        sync: false
+      - key: JWT_SECRET
+        sync: false
+      - key: RABBITMQ_HOST
+        value: rabbitmq
+      - key: RABBITMQ_PORT
+        value: "5672"
+      - key: RABBITMQ_USERNAME
+        sync: false
+      - key: RABBITMQ_PASSWORD
+        sync: false
+      - key: EUREKA_SERVER
+        value: http://service-registry:8761/eureka/
+      - key: JAVA_TOOL_OPTIONS
+        value: -Xms128m -Xmx384m
+
+  - type: pserv
+    name: follow-service
+    runtime: docker
+    plan: starter
+    repo: https://github.com/MukulAIML/ConnctSphere.git
+    branch: dev
+    dockerfilePath: follow-service/Dockerfile
+    dockerContext: follow-service
+    envVars:
+      - key: PORT
+        value: "8084"
+      - key: DB_URL
+        sync: false
+      - key: DB_USERNAME
+        sync: false
+      - key: DB_PASSWORD
+        sync: false
+      - key: JWT_SECRET
+        sync: false
+      - key: RABBITMQ_HOST
+        value: rabbitmq
+      - key: RABBITMQ_PORT
+        value: "5672"
+      - key: RABBITMQ_USERNAME
+        sync: false
+      - key: RABBITMQ_PASSWORD
+        sync: false
+      - key: EUREKA_SERVER
+        value: http://service-registry:8761/eureka/
+      - key: JAVA_TOOL_OPTIONS
+        value: -Xms128m -Xmx384m
+
+  - type: pserv
+    name: notification-service
+    runtime: docker
+    plan: starter
+    repo: https://github.com/MukulAIML/ConnctSphere.git
+    branch: notification-service
+    dockerfilePath: notification-service/Dockerfile
+    dockerContext: notification-service
+    envVars:
+      - key: PORT
+        value: "8085"
+      - key: DB_URL
+        sync: false
+      - key: DB_USERNAME
+        sync: false
+      - key: DB_PASSWORD
+        sync: false
+      - key: JWT_SECRET
+        sync: false
+      - key: REDIS_HOST
+        value: redis
+      - key: REDIS_PORT
+        value: "6379"
+      - key: RABBITMQ_HOST
+        value: rabbitmq
+      - key: RABBITMQ_PORT
+        value: "5672"
+      - key: RABBITMQ_USERNAME
+        sync: false
+      - key: RABBITMQ_PASSWORD
+        sync: false
+      - key: AUTH_SERVICE_URL
+        value: http://auth-service:8080
+      - key: POST_SERVICE_URL
+        value: http://post-service:8081
+      - key: MAIL_USERNAME
+        sync: false
+      - key: MAIL_PASSWORD
+        sync: false
+      - key: MAIL_FROM
+        sync: false
+      - key: MAIL_ENABLED
+        value: "false"
+      - key: EUREKA_SERVER
+        value: http://service-registry:8761/eureka/
+      - key: JAVA_TOOL_OPTIONS
+        value: -Xms128m -Xmx384m
+
+  - type: pserv
+    name: media-service
+    runtime: docker
+    plan: starter
+    repo: https://github.com/MukulAIML/ConnctSphere.git
+    branch: media-service
+    dockerfilePath: media-service/Dockerfile
+    dockerContext: media-service
+    envVars:
+      - key: PORT
+        value: "8086"
+      - key: DB_URL
+        sync: false
+      - key: DB_USERNAME
+        sync: false
+      - key: DB_PASSWORD
+        sync: false
+      - key: JWT_SECRET
+        sync: false
+      - key: POST_SERVICE_URL
+        value: http://post-service:8081
+      - key: EUREKA_SERVER
+        value: http://service-registry:8761/eureka/
+      - key: JAVA_TOOL_OPTIONS
+        value: -Xms128m -Xmx384m
+
+  - type: pserv
+    name: search-service
+    runtime: docker
+    plan: starter
+    repo: https://github.com/MukulAIML/ConnctSphere.git
+    branch: search-service
+    dockerfilePath: search-service/Dockerfile
+    dockerContext: search-service
+    envVars:
+      - key: PORT
+        value: "8087"
+      - key: DB_URL
+        sync: false
+      - key: DB_USERNAME
+        sync: false
+      - key: DB_PASSWORD
+        sync: false
+      - key: JWT_SECRET
+        sync: false
+      - key: ELASTICSEARCH_URI
+        value: http://elasticsearch:9200
+      - key: RABBITMQ_HOST
+        value: rabbitmq
+      - key: RABBITMQ_PORT
+        value: "5672"
+      - key: RABBITMQ_USERNAME
+        sync: false
+      - key: RABBITMQ_PASSWORD
+        sync: false
+      - key: AUTH_SERVICE_URL
+        value: http://auth-service:8080
+      - key: POST_SERVICE_URL
+        value: http://post-service:8081
+      - key: EUREKA_SERVER
+        value: http://service-registry:8761/eureka/
+      - key: JAVA_TOOL_OPTIONS
+        value: -Xms128m -Xmx384m
