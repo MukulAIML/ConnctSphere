@@ -1,0 +1,49 @@
+# api-gateway/src/main/resources/application.properties (or application.yml)
+# Copy this into your api-gateway module if it's missing
+
+spring.application.name=api-gateway
+server.port=${PORT:8080}
+
+# Eureka
+eureka.client.service-url.defaultZone=${EUREKA_SERVER:http://localhost:8761/eureka}
+eureka.instance.prefer-ip-address=true
+
+# Spring Cloud Gateway — routes (adjust as needed)
+# These use lb:// (load-balanced via Eureka) in local dev.
+# On Render, replace lb://service-name with the actual Render URL.
+spring.cloud.gateway.routes[0].id=auth-service
+spring.cloud.gateway.routes[0].uri=lb://auth-service
+spring.cloud.gateway.routes[0].predicates[0]=Path=/api/auth/**
+
+spring.cloud.gateway.routes[1].id=post-service
+spring.cloud.gateway.routes[1].uri=lb://post-service
+spring.cloud.gateway.routes[1].predicates[0]=Path=/api/posts/**
+
+spring.cloud.gateway.routes[2].id=comment-service
+spring.cloud.gateway.routes[2].uri=lb://comment-service
+spring.cloud.gateway.routes[2].predicates[0]=Path=/api/comments/**
+
+spring.cloud.gateway.routes[3].id=like-service
+spring.cloud.gateway.routes[3].uri=lb://like-service
+spring.cloud.gateway.routes[3].predicates[0]=Path=/api/likes/**
+
+spring.cloud.gateway.routes[4].id=follow-service
+spring.cloud.gateway.routes[4].uri=lb://follow-service
+spring.cloud.gateway.routes[4].predicates[0]=Path=/api/follow/**
+
+spring.cloud.gateway.routes[5].id=notification-service
+spring.cloud.gateway.routes[5].uri=lb://notification-service
+spring.cloud.gateway.routes[5].predicates[0]=Path=/api/notifications/**
+
+spring.cloud.gateway.routes[6].id=media-service
+spring.cloud.gateway.routes[6].uri=lb://media-service
+spring.cloud.gateway.routes[6].predicates[0]=Path=/api/media/**
+
+spring.cloud.gateway.routes[7].id=search-service
+spring.cloud.gateway.routes[7].uri=lb://search-service
+spring.cloud.gateway.routes[7].predicates[0]=Path=/api/search/**
+
+# JWT
+jwt.secret=${JWT_SECRET}
+
+management.endpoints.web.exposure.include=health,info
