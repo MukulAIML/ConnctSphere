@@ -32,7 +32,6 @@ public class SecurityConfig {
     private final RedisSessionService redisSessionService;
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
-    private final OAuth2LoginSuccessHandler oAuth2LoginSuccessHandler;
 
     @Bean
     public JwtAuthFilter jwtAuthFilter() {
@@ -78,9 +77,6 @@ public class SecurityConfig {
                     "/auth/login",
                     "/auth/refresh",
                     "/auth/validate",
-                    "/auth/oauth2/**",
-                    "/oauth2/**",
-                    "/login/oauth2/**",
                     "/swagger-ui/**",
                     "/swagger-ui.html",
                     "/api-docs/**",
@@ -105,9 +101,6 @@ public class SecurityConfig {
 
                 // ✅ Everything else needs JWT
                 .anyRequest().authenticated()
-            )
-            .oauth2Login(oauth -> oauth
-                .successHandler(oAuth2LoginSuccessHandler)
             )
 
             // ✅ Use JWT instead of default login

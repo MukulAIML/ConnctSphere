@@ -1,0 +1,9 @@
+com/connectsphere/auth/service/AuthServiceImplTest$TokenOps.class
+com/connectsphere/auth/service/AuthServiceImplTest$ChangePassword.class
+com/connectsphere/auth/service/AuthServiceImplTest$UpdateProfile.class
+com/connectsphere/auth/service/AuthServiceImplTest$Login.class
+com/connectsphere/auth/security/JwtUtilsTest.class
+com/connectsphere/auth/service/AuthServiceImplTest.class
+com/connectsphere/auth/service/AuthServiceImplTest$Register.class
+com/connectsphere/auth/repository/UserRepositoryTest.class
+com/connectsphere/auth/service/AuthServiceImplTest$OAuth.class
