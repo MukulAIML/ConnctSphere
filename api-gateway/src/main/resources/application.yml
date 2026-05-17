@@ -33,75 +33,75 @@ spring:
       # ── Routes ───────────────────────────────────────────────────────────────
       routes:
         - id: auth-service
-          uri: lb://AUTH-SERVICE
+          uri: ${AUTH_SERVICE_URL:lb://AUTH-SERVICE}
           predicates:
             - Path=/api/v1/auth/**, /auth/**
           filters:
             - RewritePath=/api/v1/auth(?<segment>/?.*), /auth${segment}
 
         - id: post-service
-          uri: lb://POST-SERVICE
+          uri: ${POST_SERVICE_URL:lb://POST-SERVICE}
           predicates:
             - Path=/api/v1/posts/**, /posts/**
           filters:
             - RewritePath=/api/v1/posts(?<segment>/?.*), /posts${segment}
 
         - id: comment-service
-          uri: lb://COMMENT-SERVICE
+          uri: ${COMMENT_SERVICE_URL:lb://COMMENT-SERVICE}
           predicates:
             - Path=/api/v1/comments/**, /comments/**
           filters:
             - RewritePath=/api/v1/comments(?<segment>/?.*), /comments${segment}
 
         - id: like-service
-          uri: lb://LIKE-SERVICE
+          uri: ${LIKE_SERVICE_URL:lb://LIKE-SERVICE}
           predicates:
             - Path=/api/v1/likes/**, /likes/**
           filters:
             - RewritePath=/api/v1/likes(?<segment>/?.*), /likes${segment}
 
         - id: follow-service
-          uri: lb://FOLLOW-SERVICE
+          uri: ${FOLLOW_SERVICE_URL:lb://FOLLOW-SERVICE}
           predicates:
             - Path=/api/v1/follows/**, /follows/**
           filters:
             - RewritePath=/api/v1/follows(?<segment>/?.*), /follows${segment}
 
         - id: notification-service
-          uri: lb://NOTIFICATION-SERVICE
+          uri: ${NOTIFICATION_SERVICE_URL:lb://NOTIFICATION-SERVICE}
           predicates:
             - Path=/api/v1/notifications/**, /notifications/**
           filters:
             - RewritePath=/api/v1/notifications(?<segment>/?.*), /notifications${segment}
 
         - id: notification-service-websocket
-          uri: lb:ws://NOTIFICATION-SERVICE
+          uri: ${NOTIFICATION_SERVICE_WS_URL:lb:ws://NOTIFICATION-SERVICE}
           predicates:
             - Path=/ws-notifications, /ws-notifications/**
 
         - id: media-service-media
-          uri: lb://MEDIA-SERVICE
+          uri: ${MEDIA_SERVICE_URL:lb://MEDIA-SERVICE}
           predicates:
             - Path=/api/v1/media/**, /media/**
           filters:
             - RewritePath=/api/v1/media(?<segment>/?.*), /media${segment}
 
         - id: media-service-stories
-          uri: lb://MEDIA-SERVICE
+          uri: ${MEDIA_SERVICE_URL:lb://MEDIA-SERVICE}
           predicates:
             - Path=/api/v1/stories/**, /stories/**
           filters:
             - RewritePath=/api/v1/stories(?<segment>/?.*), /stories${segment}
 
         - id: search-service
-          uri: lb://SEARCH-SERVICE
+          uri: ${SEARCH_SERVICE_URL:lb://SEARCH-SERVICE}
           predicates:
             - Path=/api/v1/search/**, /search/**
           filters:
             - RewritePath=/api/v1/search(?<segment>/?.*), /search${segment}
 
         - id: hashtag-service
-          uri: lb://SEARCH-SERVICE
+          uri: ${SEARCH_SERVICE_URL:lb://SEARCH-SERVICE}
           predicates:
             - Path=/api/v1/hashtags/**, /hashtags/**
           filters:
