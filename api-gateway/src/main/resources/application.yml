@@ -29,7 +29,7 @@ spring:
       # be forwarded as-is to every downstream service so they can validate JWT.
       default-filters:
         - PreserveHostHeader
-        - DeduplicateResponseHeader=Access-Control-Allow-Origin Access-Control-Allow-Credentials, RETAIN_LAST
+        - "DeduplicateResponseHeader=Access-Control-Allow-Origin Access-Control-Allow-Credentials, RETAIN_LAST"
 
       # ── Routes ───────────────────────────────────────────────────────────────
       routes:
