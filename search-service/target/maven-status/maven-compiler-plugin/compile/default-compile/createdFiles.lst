@@ -28,4 +28,5 @@ com/connectsphere/search/repository/PostHashtagRepository.class
 com/connectsphere/search/entity/PostHashtagEntity$PostHashtagEntityBuilder.class
 com/connectsphere/search/config/RestTemplateConfig.class
 com/connectsphere/search/SearchServiceApplication.class
+com/connectsphere/search/config/MockDependenciesConfig.class
 com/connectsphere/search/dto/HashtagResponseDTO$HashtagResponseDTOBuilder.class
