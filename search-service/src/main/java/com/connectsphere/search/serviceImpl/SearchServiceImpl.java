@@ -2,12 +2,12 @@ package com.connectsphere.search.serviceImpl;
 
 import com.connectsphere.search.dto.HashtagResponseDTO;
 import com.connectsphere.search.dto.IndexRequestDTO;
-import com.connectsphere.search.entity.HashtagDocument;
+
 import com.connectsphere.search.entity.HashtagEntity;
 import com.connectsphere.search.entity.PostHashtagEntity;
 import com.connectsphere.search.exception.BadRequestException;
 import com.connectsphere.search.exception.ResourceNotFoundException;
-import com.connectsphere.search.repository.HashtagElasticsearchRepository;
+
 import com.connectsphere.search.repository.HashtagRepository;
 import com.connectsphere.search.repository.PostHashtagRepository;
 import com.connectsphere.search.service.SearchService;
@@ -21,8 +21,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.lang.Nullable;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -46,8 +44,6 @@ public class SearchServiceImpl implements SearchService {
 
     private static final Pattern HASHTAG_PATTERN = Pattern.compile("(?<![A-Za-z0-9_])#([A-Za-z0-9_]{1,100})");
 
-    @Nullable
-    private final HashtagElasticsearchRepository elasticsearchRepository;
     private final HashtagRepository hashtagRepository;
     private final PostHashtagRepository postHashtagRepository;
     private final RestTemplate restTemplate;
@@ -59,18 +55,13 @@ public class SearchServiceImpl implements SearchService {
     private String postServiceUrl;
 
     public SearchServiceImpl(
-            @Autowired(required = false) HashtagElasticsearchRepository elasticsearchRepository,
             HashtagRepository hashtagRepository,
             PostHashtagRepository postHashtagRepository,
             RestTemplate restTemplate
     ) {
-        this.elasticsearchRepository = elasticsearchRepository;
         this.hashtagRepository = hashtagRepository;
         this.postHashtagRepository = postHashtagRepository;
         this.restTemplate = restTemplate;
-        if (elasticsearchRepository == null) {
-            logger.warn("Elasticsearch is not available - hashtag sync to ES will be skipped");
-        }
     }
 
     @Override
@@ -369,44 +360,17 @@ public class SearchServiceImpl implements SearchService {
         Optional<HashtagEntity> hashtagOpt = hashtagRepository.findById(hashtagId);
 
         if (hashtagOpt.isEmpty()) {
-            tryDeleteFromEs(String.valueOf(hashtagId));
             return;
         }
 
         HashtagEntity hashtag = hashtagOpt.get();
         if (mappingCount <= 0) {
             hashtagRepository.delete(hashtag);
-            tryDeleteFromEs(String.valueOf(hashtagId));
             return;
         }
 
         hashtag.setPostCount((int) mappingCount);
         HashtagEntity saved = hashtagRepository.save(hashtag);
-
-        trySaveToEs(saved);
-    }
-
-    private void trySaveToEs(HashtagEntity saved) {
-        if (elasticsearchRepository == null) return;
-        try {
-            elasticsearchRepository.save(HashtagDocument.builder()
-                    .id(String.valueOf(saved.getHashtagId()))
-                    .tag(saved.getTag())
-                    .postCount(saved.getPostCount())
-                    .lastUsedAt(saved.getLastUsedAt())
-                    .build());
-        } catch (Exception e) {
-            logger.warn("ES sync skipped for hashtag {}: {}", saved.getTag(), e.getMessage());
-        }
-    }
-
-    private void tryDeleteFromEs(String id) {
-        if (elasticsearchRepository == null) return;
-        try {
-            elasticsearchRepository.deleteById(id);
-        } catch (Exception e) {
-            logger.warn("ES delete skipped for id {}: {}", id, e.getMessage());
-        }
     }
 
     private HashtagResponseDTO mapToDTO(HashtagEntity hashtag) {
