@@ -5,23 +5,25 @@ spring:
   application:
     name: post-service
   datasource:
-    url: ${SPRING_DATASOURCE_URL:${DB_URL:jdbc:h2:mem:postdb;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE}}
-    username: ${SPRING_DATASOURCE_USERNAME:${DB_USERNAME:sa}}
-    password: ${SPRING_DATASOURCE_PASSWORD:${DB_PASSWORD:}}
-    driver-class-name: ${SPRING_DATASOURCE_DRIVER_CLASS_NAME:org.h2.Driver}
+    url: ${DB_URL:jdbc:mysql://connectsphere-db:3306/post_db?createDatabaseIfNotExist=true&useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC}
+    username: ${DB_USERNAME:mukul}
+    password: ${DB_PASSWORD:password}
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    hikari:
+      maximum-pool-size: ${SPRING_DATASOURCE_HIKARI_MAXIMUM_POOL_SIZE:10}
   jpa:
     hibernate:
       ddl-auto: update
     show-sql: true
-    database-platform: ${SPRING_JPA_DATABASE_PLATFORM:org.hibernate.dialect.H2Dialect}
     properties:
       hibernate:
+        dialect: org.hibernate.dialect.MySQLDialect
         format_sql: true
 
   # Redis Configuration
   data:
     redis:
-      host: ${SPRING_DATA_REDIS_HOST:${REDIS_HOST:localhost}}
+      host: ${REDIS_HOST:localhost}
       port: ${REDIS_PORT:6379}
       password: ${REDIS_PASSWORD:}
       timeout: 2000ms
@@ -32,7 +34,9 @@ spring:
           min-idle: 2
 
   cache:
-    type: ${SPRING_CACHE_TYPE:none}
+    type: ${SPRING_CACHE_TYPE:redis}
+    redis:
+      time-to-live: 300000   # 5 minutes TTL for feed cache
 
   rabbitmq:
     host: ${RABBITMQ_HOST:rabbitmq}
@@ -48,6 +52,8 @@ app:
     routing-key:
       notification-dispatch: ${RABBITMQ_NOTIFICATION_ROUTING_KEY:notification.dispatch}
       hashtag-index: ${RABBITMQ_HASHTAG_ROUTING_KEY:hashtag.index}
+  search:
+    reindex-hashtags-on-startup: false
 
 # External Service URLs
 search-service:
@@ -99,3 +105,12 @@ springdoc:
     operationsSorter: method
     tagsSorter: alpha
     display-request-duration: true
+
+management:
+  health:
+    redis:
+      enabled: false
+    rabbit:
+      enabled: false
+    db:
+      enabled: false
