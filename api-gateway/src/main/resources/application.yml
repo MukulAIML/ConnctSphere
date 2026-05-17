@@ -27,8 +27,8 @@ spring:
       # PreserveHostHeader: keeps the original Host header.
       # There is NO RemoveRequestHeader for Authorization here — the token must
       # be forwarded as-is to every downstream service so they can validate JWT.
-      default-filters:
-        - PreserveHostHeader
+      # default-filters:
+      #   - PreserveHostHeader
 
       # ── Routes ───────────────────────────────────────────────────────────────
       routes:
