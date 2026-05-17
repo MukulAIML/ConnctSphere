@@ -6,18 +6,18 @@ spring:
     name: notification-service
 
   datasource:
-    url: ${DB_URL:jdbc:mysql://connectsphere-db:3306/notification_db?createDatabaseIfNotExist=true&useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC}
-    username: ${DB_USERNAME:mukul}
-    password: ${DB_PASSWORD:password}
-    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: ${SPRING_DATASOURCE_URL:${DB_URL:jdbc:h2:mem:notifdb;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE}}
+    username: ${SPRING_DATASOURCE_USERNAME:${DB_USERNAME:sa}}
+    password: ${SPRING_DATASOURCE_PASSWORD:${DB_PASSWORD:}}
+    driver-class-name: ${SPRING_DATASOURCE_DRIVER_CLASS_NAME:org.h2.Driver}
 
   jpa:
     hibernate:
       ddl-auto: update
     show-sql: true
+    database-platform: ${SPRING_JPA_DATABASE_PLATFORM:org.hibernate.dialect.H2Dialect}
     properties:
       hibernate:
-        dialect: org.hibernate.dialect.MySQLDialect
         format_sql: true
 
   rabbitmq:
@@ -28,7 +28,7 @@ spring:
 
   data:
     redis:
-      host: ${REDIS_HOST:redis}
+      host: ${SPRING_DATA_REDIS_HOST:${REDIS_HOST:localhost}}
       port: ${REDIS_PORT:6379}
       password: ${REDIS_PASSWORD:}
 
@@ -47,7 +47,7 @@ spring:
 
 app:
   jwt:
-    secret: ${JWT_SECRET:ConnectSphereSecretKey2026ConnectSphereSecretKey2026ConnectSphereSecretKey}
+    secret: ${APP_JWT_SECRET:${JWT_SECRET:ConnectSphereSecretKey2026ConnectSphereSecretKey2026ConnectSphereSecretKey}}
 
   rabbitmq:
     exchange: connectsphere.exchange
@@ -75,3 +75,14 @@ springdoc:
     path: /api-docs
   swagger-ui:
     path: /swagger-ui.html
+
+management:
+  health:
+    redis:
+      enabled: false
+    rabbit:
+      enabled: false
+    mail:
+      enabled: false
+    db:
+      enabled: false
