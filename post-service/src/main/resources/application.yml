@@ -1,0 +1,107 @@
+server:
+  port: 8081
+
+spring:
+  application:
+    name: post-service
+  datasource:
+    url: ${DB_URL:jdbc:mysql://connectsphere-db:3306/post_db?createDatabaseIfNotExist=true&useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC}
+    username: ${DB_USERNAME:mukul}
+    password: ${DB_PASSWORD:password}
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    hikari:
+      maximum-pool-size: ${SPRING_DATASOURCE_HIKARI_MAXIMUM_POOL_SIZE:10}
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.MySQLDialect
+        format_sql: true
+
+  # Redis Configuration
+  data:
+    redis:
+      host: ${REDIS_HOST:redis}
+      port: ${REDIS_PORT:6379}
+      password: ${REDIS_PASSWORD:}
+      timeout: 2000ms
+      lettuce:
+        pool:
+          max-active: 50
+          max-idle: 10
+          min-idle: 2
+
+  cache:
+    type: ${SPRING_CACHE_TYPE:redis}
+    redis:
+      time-to-live: 300000   # 5 minutes TTL for feed cache
+
+  rabbitmq:
+    host: ${RABBITMQ_HOST:rabbitmq}
+    port: ${RABBITMQ_PORT:5672}
+    username: ${RABBITMQ_USERNAME:guest}
+    password: ${RABBITMQ_PASSWORD:guest}
+
+app:
+  jwt:
+    secret: ${APP_JWT_SECRET:${JWT_SECRET:ConnectSphereSecretKey2026ConnectSphereSecretKey2026ConnectSphereSecretKey}}
+  rabbitmq:
+    exchange: ${RABBITMQ_EXCHANGE:connectsphere.exchange}
+    routing-key:
+      notification-dispatch: ${RABBITMQ_NOTIFICATION_ROUTING_KEY:notification.dispatch}
+      hashtag-index: ${RABBITMQ_HASHTAG_ROUTING_KEY:hashtag.index}
+  search:
+    reindex-hashtags-on-startup: false
+
+# External Service URLs
+search-service:
+  url: ${SEARCH_SERVICE_URL:http://search-service:8087}
+
+follow-service:
+  url: ${FOLLOW_SERVICE_URL:http://follow-service:8084}
+
+media-service:
+  url: ${MEDIA_SERVICE_URL:http://media-service:8086}
+
+auth-service:
+  url: ${AUTH_SERVICE_URL:http://auth-service:8080}
+
+comment-service:
+  url: ${COMMENT_SERVICE_URL:http://comment-service:8082}
+
+notification-service:
+  url: ${NOTIFICATION_SERVICE_URL:http://notification-service:8085}
+
+# Feed Pre-computation Scheduler
+feed:
+  cache:
+    ttl-minutes: 5
+  scheduler:
+    cron: ${FEED_SCHEDULER_CRON:0 */5 * * * *}
+
+# AWS Rekognition — Content Moderation
+aws:
+  region: ${AWS_REGION:us-east-1}
+  access-key: ${AWS_ACCESS_KEY_ID:}
+  secret-key: ${AWS_SECRET_ACCESS_KEY:}
+  rekognition:
+    enabled: ${AWS_REKOGNITION_ENABLED:false}
+    moderation-threshold: ${AWS_MODERATION_THRESHOLD:75}
+
+# Eureka Service Discovery
+eureka:
+  client:
+    service-url:
+      defaultZone: ${EUREKA_SERVER:http://service-registry:8761/eureka/}
+
+# Springdoc / Swagger
+springdoc:
+  api-docs:
+    path: /v3/api-docs
+  swagger-ui:
+    path: /swagger-ui.html
+    operationsSorter: method
+    tagsSorter: alpha
+    display-request-duration: true
