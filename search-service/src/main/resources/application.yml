@@ -6,22 +6,24 @@ spring:
     name: search-service
 
   datasource:
-    url: ${SPRING_DATASOURCE_URL:${DB_URL:jdbc:h2:mem:searchdb;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE}}
-    username: ${SPRING_DATASOURCE_USERNAME:${DB_USERNAME:sa}}
-    password: ${SPRING_DATASOURCE_PASSWORD:${DB_PASSWORD:}}
-    driver-class-name: ${SPRING_DATASOURCE_DRIVER_CLASS_NAME:org.h2.Driver}
+    url: ${DB_URL:jdbc:mysql://connectsphere-db:3306/search_db?createDatabaseIfNotExist=true&useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC}
+    username: ${DB_USERNAME:mukul}
+    password: ${DB_PASSWORD:password}
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    hikari:
+      maximum-pool-size: ${SPRING_DATASOURCE_HIKARI_MAXIMUM_POOL_SIZE:10}
 
   jpa:
     hibernate:
       ddl-auto: update
     show-sql: true
-    database-platform: ${SPRING_JPA_DATABASE_PLATFORM:org.hibernate.dialect.H2Dialect}
     properties:
       hibernate:
+        dialect: org.hibernate.dialect.MySQLDialect
         format_sql: true
 
   elasticsearch:
-    uris: ${ELASTICSEARCH_URI:http://elasticsearch:9200}
+    uris: ${ELASTICSEARCH_URI:http://localhost:9200}
     username: ${ELASTICSEARCH_USERNAME:}
     password: ${ELASTICSEARCH_PASSWORD:}
 
@@ -58,12 +60,3 @@ springdoc:
     path: /api-docs
   swagger-ui:
     path: /swagger-ui.html
-
-management:
-  health:
-    elasticsearch:
-      enabled: false
-    rabbit:
-      enabled: false
-    db:
-      enabled: false
