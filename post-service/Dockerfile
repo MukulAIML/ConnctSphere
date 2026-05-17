@@ -5,7 +5,7 @@ COPY src ./src
 RUN mvn clean package -Dmaven.test.skip=true
 
 FROM eclipse-temurin:17-jre-jammy
+RUN apt-get update && apt-get install -y redis-server rabbitmq-server
 WORKDIR /app
 COPY --from=build /app/target/*.jar app.jar
-ENTRYPOINT ["java", "-jar", "app.jar"]
-
+ENTRYPOINT service redis-server start && service rabbitmq-server start && java -jar app.jar
